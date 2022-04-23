@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "250366507781",
+    "project_id": "buildthesis",
+    "storage_bucket": "buildthesis.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:250366507781:android:74da018f9d7ee2c09e556c",
+        "android_client_info": {
+          "package_name": "com.moealshidi.thesis"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "250366507781-g66luhqrb0r3j42i715gup662s8m2id0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBSmU5AdHmiH59nBy4gbG-DFTz20izY3m8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "250366507781-g66luhqrb0r3j42i715gup662s8m2id0.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
