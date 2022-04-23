@@ -8,4 +8,9 @@ class LoginCubit extends Cubit<LoginState> {
   static LoginCubit get(BuildContext context) {
     return BlocProvider.of((context));
   }
+
+  void userLogin({
+    required email,
+    required password,
+  }) {}
 }
