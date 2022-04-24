@@ -3,7 +3,7 @@ import 'package:build/view/components/constant.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-class DefualtForm extends StatelessWidget {
+class DefualtForm extends StatefulWidget {
   final TextEditingController controller;
   final String label;
   final IconData? suffixIcon;
@@ -33,6 +33,11 @@ class DefualtForm extends StatelessWidget {
   }) : super(key: key);
 
   @override
+  State<DefualtForm> createState() => _DefualtFormState();
+}
+
+class _DefualtFormState extends State<DefualtForm> {
+  @override
   Widget build(BuildContext context) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
@@ -41,7 +46,7 @@ class DefualtForm extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.only(left: 10, bottom: 10),
           child: Text(
-            label,
+            widget.label,
             style:
                 const TextStyle(color: CustomColors.KmainColor, fontSize: 18),
           ),
@@ -52,26 +57,28 @@ class DefualtForm extends StatelessWidget {
             fontWeight: FontWeight.w500,
             color: CustomColors.KmainColor,
           ),
-          readOnly: read,
-          inputFormatters: inputFormatter,
-          maxLength: maxLength,
-          keyboardType: inputType,
-          initialValue: initValue,
-          obscureText: isPassword,
-          controller: controller,
+          readOnly: widget.read,
+          inputFormatters: widget.inputFormatter,
+          maxLength: widget.maxLength,
+          keyboardType: widget.inputType,
+          initialValue: widget.initValue,
+          obscureText: widget.isPassword,
+          controller: widget.controller,
           textAlign: TextAlign.start,
           decoration: InputDecoration(
-            hintText: hint,
+            hintText: widget.hint,
             counterText: "",
             suffixIcon: GestureDetector(
-              onTap: () => function,
+              onTap: () {
+                print('Hello');
+              },
               child: Icon(
-                suffixIcon,
+                widget.suffixIcon,
                 color: CustomColors.KmainColor,
               ),
             ),
             prefixIcon: Icon(
-              prefixIcon,
+              widget.prefixIcon,
               color: CustomColors.KmainColor,
             ),
           ),
