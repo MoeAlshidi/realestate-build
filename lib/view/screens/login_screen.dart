@@ -4,6 +4,7 @@ import 'package:conditional_builder_rec/conditional_builder_rec.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../components/component.dart' as components;
+import 'register_screen.dart';
 
 class LoginScreen extends StatelessWidget {
   LoginScreen({Key? key}) : super(key: key);
@@ -56,12 +57,12 @@ class LoginScreen extends StatelessWidget {
                               height: 30,
                             ),
                             components.DefualtForm(
-                              isPassword: true,
+                              isPassword: loginCubit.isPassword,
                               controller: passwordController,
                               label: 'Password',
                               read: false,
                               prefixIcon: Icons.lock_outlined,
-                              function: () {},
+                              function: loginCubit.passwordVisibility,
                               suffixIcon: Icons.visibility,
                             ),
                           ],
@@ -108,6 +109,28 @@ class LoginScreen extends StatelessWidget {
                             ),
                           ],
                         ),
+                      ),
+                      SizedBox(
+                        height: screenSize.height * 0.06,
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Text("Dont Have an Account?"),
+                          TextButton(
+                            onPressed: () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => RegisterScreen()),
+                            ),
+                            child: const Text(
+                              'Sign up',
+                              style: TextStyle(
+                                color: CustomColors.KmainColor,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
