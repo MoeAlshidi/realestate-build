@@ -1,5 +1,6 @@
 import 'package:build/shared/cubit/login_cubit.dart';
 import 'package:build/view/components/constant.dart';
+import 'package:build/view/screens/login_screen.dart';
 import 'package:conditional_builder_rec/conditional_builder_rec.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -22,6 +23,12 @@ class RegisterScreen extends StatelessWidget {
       child: BlocConsumer<LoginCubit, LoginState>(
         listener: (context, state) {
           // TODO: implement listener
+          if (state is CreateUserSuccessState) {
+            Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (_) => LoginScreen()),
+                (route) => false);
+          }
         },
         builder: (context, state) {
           LoginCubit loginCubit = LoginCubit.get(context);
@@ -121,6 +128,8 @@ class RegisterScreen extends StatelessWidget {
                                         loginCubit.userRegister(
                                           email: emailController.text,
                                           password: passwordController.text,
+                                          fname: fNameController.text,
+                                          lname: lNameController.text,
                                         );
                                       }
                                     },

@@ -26,3 +26,13 @@ class RegisterErrorState extends LoginState {
 
   RegisterErrorState(this.error);
 }
+
+class CreateUserLoadingState extends LoginState {}
+
+class CreateUserSuccessState extends LoginState {}
+
+class CreateUserErrorState extends LoginState {
+  final String error;
+
+  CreateUserErrorState(this.error);
+}

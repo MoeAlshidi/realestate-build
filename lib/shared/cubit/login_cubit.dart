@@ -1,5 +1,6 @@
 import 'package:bloc/bloc.dart';
-import 'package:build/shared/server/helpers/firestore_helper.dart';
+import 'package:build/models/agent_model.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -12,8 +13,8 @@ class LoginCubit extends Cubit<LoginState> {
   }
 
   void userLogin({
-    required email,
-    required password,
+    required String email,
+    required String password,
   }) {
     emit(LoginLoadingState());
     FirebaseAuth.instance
@@ -34,8 +35,10 @@ class LoginCubit extends Cubit<LoginState> {
   }
 
   void userRegister({
-    required email,
-    required password,
+    required String email,
+    required String password,
+    required String fname,
+    required String lname,
   }) {
     emit(RegisterLoadingState());
     FirebaseAuth.instance
@@ -45,6 +48,12 @@ class LoginCubit extends Cubit<LoginState> {
     )
         .then((value) {
       print(value.user!.email);
+      createUser(
+        fname: fname,
+        lname: lname,
+        email: email,
+        uId: value.user!.uid,
+      );
       emit(RegisterSuccessState());
     }).catchError(
       (error) {
@@ -53,6 +62,32 @@ class LoginCubit extends Cubit<LoginState> {
         );
       },
     );
+  }
+
+  void createUser({
+    required String fname,
+    required String lname,
+    required String email,
+    required String uId,
+  }) {
+    Agent agent = Agent(
+      fname: fname,
+      lname: lname,
+      email: email,
+      uId: uId,
+    );
+    emit(CreateUserLoadingState());
+    print('Start Create');
+    FirebaseFirestore.instance
+        .collection('Agent')
+        .doc(uId)
+        .set(agent.toMap())
+        .then((value) {
+      emit(CreateUserSuccessState());
+      print('Done');
+    }).catchError((error) {
+      emit(CreateUserErrorState(error.toString()));
+    });
   }
 
   bool isPassword = true;
