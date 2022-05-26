@@ -1,5 +1,6 @@
 import 'package:bloc/bloc.dart';
-import 'package:build/models/agent_model.dart';
+import 'package:build/models/project_model.dart';
+import 'package:build/models/user_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -23,10 +24,10 @@ class LoginCubit extends Cubit<LoginState> {
       password: password,
     )
         .then((value) {
-      print(value.user!.email);
-      emit(LoginSuccessState());
+      emit(LoginSuccessState(value.user!.uid));
     }).catchError(
       (error) {
+        print("ERRRORR $error");
         emit(
           LoginErrorState(error.toString()),
         );
@@ -47,7 +48,6 @@ class LoginCubit extends Cubit<LoginState> {
       password: password,
     )
         .then((value) {
-      print(value.user!.email);
       createUser(
         fname: fname,
         lname: lname,
@@ -70,21 +70,26 @@ class LoginCubit extends Cubit<LoginState> {
     required String email,
     required String uId,
   }) {
-    Agent agent = Agent(
-      fname: fname,
-      lname: lname,
-      email: email,
-      uId: uId,
-    );
+    UserModel user = UserModel(
+        fname: fname,
+        lname: lname,
+        email: email,
+        uId: uId,
+        role: 'agent',
+        profileImage:
+            'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSKKj4HIjucFnNOM1pMIUnB7PtWsdCym-4eCRjkV3OfYjKnxpkMJDOqHPIwK3pCd0aeQLc&usqp=CAU',
+        projectModel: [
+          ProjectModel(progress: 0.3),
+        ]);
     emit(CreateUserLoadingState());
-    print('Start Create');
+
     FirebaseFirestore.instance
-        .collection('Agent')
+        .collection('User')
         .doc(uId)
-        .set(agent.toMap())
+        .set(user.toMap())
         .then((value) {
+      print(user.profileImage);
       emit(CreateUserSuccessState());
-      print('Done');
     }).catchError((error) {
       emit(CreateUserErrorState(error.toString()));
     });

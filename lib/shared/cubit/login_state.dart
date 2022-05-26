@@ -9,7 +9,11 @@ class PasswordVisibility extends LoginState {}
 
 class LoginLoadingState extends LoginState {}
 
-class LoginSuccessState extends LoginState {}
+class LoginSuccessState extends LoginState {
+  String accessToken;
+
+  LoginSuccessState(this.accessToken);
+}
 
 class LoginErrorState extends LoginState {
   final String error;
