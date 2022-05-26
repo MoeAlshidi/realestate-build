@@ -69,9 +69,7 @@ class _DefualtFormState extends State<DefualtForm> {
             hintText: widget.hint,
             counterText: "",
             suffixIcon: GestureDetector(
-              onTap: () {
-                print('Hello');
-              },
+              onTap: widget.function,
               child: Icon(
                 widget.suffixIcon,
                 color: CustomColors.KmainColor,

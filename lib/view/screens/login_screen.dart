@@ -1,3 +1,4 @@
+import 'package:build/shared/cubit/home_cubit.dart';
 import 'package:build/shared/cubit/login_cubit.dart';
 import 'package:build/view/components/constant.dart';
 import 'package:build/view/screens/home_screen.dart';
@@ -9,11 +10,20 @@ import '../../shared/local/cache_helper.dart';
 import '../components/component.dart' as components;
 import 'register_screen.dart';
 
-class LoginScreen extends StatelessWidget {
+class LoginScreen extends StatefulWidget {
   LoginScreen({Key? key}) : super(key: key);
+
+  @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
   final formKey = GlobalKey<FormState>();
+
   final emailController = TextEditingController();
+
   final passwordController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     var screenSize = MediaQuery.of(context).size;
@@ -77,7 +87,7 @@ class LoginScreen extends StatelessWidget {
                               read: false,
                               prefixIcon: Icons.lock_outlined,
                               function: loginCubit.passwordVisibility,
-                              suffixIcon: Icons.visibility,
+                              suffixIcon: loginCubit.suffix,
                             ),
                           ],
                         ),

@@ -94,7 +94,7 @@ class RegisterScreen extends StatelessWidget {
                                 label: 'Password',
                                 read: false,
                                 prefixIcon: Icons.lock_outlined,
-                                function: () => loginCubit.passwordVisibility(),
+                                function: loginCubit.passwordVisibility,
                                 suffixIcon: loginCubit.suffix,
                               ),
                             ],
