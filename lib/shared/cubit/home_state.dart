@@ -15,3 +15,13 @@ class GetDataError extends HomeState {
   final String error;
   GetDataError(this.error);
 }
+
+//create Post
+class PostFeedLoading extends HomeState {}
+
+class PostFeedSuccess extends HomeState {}
+
+class PostFeedError extends HomeState {
+  final String error;
+  PostFeedError(this.error);
+}

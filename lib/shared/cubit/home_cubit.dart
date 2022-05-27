@@ -5,6 +5,7 @@ import 'package:build/view/screens/home_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 
 part 'home_state.dart';
 
@@ -16,7 +17,7 @@ class HomeCubit extends Cubit<HomeState> {
 
   List<Widget> screenList = [
     HomeScreen(),
-    const FeedScreen(),
+    FeedScreen(),
   ];
   int currentIndex = 0;
   void currentScreen(int index) {
@@ -38,5 +39,15 @@ class HomeCubit extends Cubit<HomeState> {
     }).catchError((error) {
       emit(GetDataError(error.toString()));
     });
+  }
+
+  void CreatePost({
+    required String id,
+    required String feed,
+    List<String>? image,
+    required DateTime date,
+  }) {
+    emit(PostFeedLoading());
+    // firebase_storage.FirebaseStorage.instance.ref().child('feeds/${}')
   }
 }
