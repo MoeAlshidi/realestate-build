@@ -30,6 +30,12 @@ class Wrapper extends StatelessWidget {
                     Icons.add,
                   ),
                   label: 'Feeds',
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(
+                    Icons.settings,
+                  ),
+                  label: 'Settings',
                 )
               ],
             ),
