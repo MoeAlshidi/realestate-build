@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:build/models/feed_model.dart';
 import 'package:build/models/user_model.dart';
 import 'package:build/view/components/constant.dart';
 import 'package:build/view/screens/feed_screen.dart';
@@ -24,6 +25,7 @@ class HomeCubit extends Cubit<HomeState> {
     FeedScreen(),
     const SettingsScreen(),
   ];
+  int progress = 30;
   int currentIndex = 0;
   void currentScreen(int index) {
     currentIndex = index;
@@ -40,6 +42,7 @@ class HomeCubit extends Cubit<HomeState> {
         .get()
         .then((value) {
       userModel = UserModel.fromJson(value.data()!);
+      getPosts();
       emit(GetDataSuccess());
     }).catchError((error) {
       emit(GetDataError(error.toString()));
@@ -58,19 +61,63 @@ class HomeCubit extends Cubit<HomeState> {
     });
   }
 
+  File? postImagePath;
+  String postImageUrl = '';
+  final pickerPost = ImagePicker();
+  Future<void> getPostImagePath() async {
+    final pickedFile = await pickerPost.pickImage(source: ImageSource.gallery);
+
+    if (pickedFile != null) {
+      postImagePath = File(pickedFile.path);
+      emit(GetPostImageSuccess());
+    } else {
+      emit(GetPostImageError('No images Selected'));
+    }
+  }
+
+  void uploadPostImage({required String feed, required DateTime date}) {
+    emit(UploadPostFeedLoading());
+    firebase_storage.FirebaseStorage.instance
+        .ref()
+        .child('feeds/${Uri.file(postImagePath!.path).pathSegments.last}')
+        .putFile(postImagePath!)
+        .then((value) {
+      value.ref.getDownloadURL().then((value) {
+        postImageUrl = value;
+        createPost(feed: feed, date: date, image: value);
+        emit(UploadPostFeedSuccess());
+      });
+    }).catchError((error) {
+      emit(UploadPostFeedError(error.toString()));
+    });
+  }
+
   void createPost({
-    required String id,
     required String feed,
-    List<String>? image,
+    String? image,
     required DateTime date,
   }) {
-    emit(PostFeedLoading());
-    // firebase_storage.FirebaseStorage.instance.ref().child('feeds/${}')
+    FeedModel model = FeedModel(
+      id: token,
+      date: Timestamp.fromDate(date),
+      profileImage: userModel!.profileImage,
+      feed: feed,
+      feedImages: image,
+      name: '${userModel!.fname} ${userModel!.lname}',
+    );
+
+    FirebaseFirestore.instance
+        .collection('posts')
+        .add(model.toMap())
+        .then((value) {
+      emit(PostFeedSuccess());
+    }).catchError((error) {
+      emit(PostFeedError(error.toString()));
+    });
   }
 
   String profileImageUrl = '';
   void uploadProfile() {
-    print(token);
     firebase_storage.FirebaseStorage.instance
         .ref()
         .child('User/${Uri.file(profileimage!.path).pathSegments.last}')
@@ -98,5 +145,22 @@ class HomeCubit extends Cubit<HomeState> {
     } else {
       emit(GetImageError('No images Selected'));
     }
+  }
+
+  List<FeedModel> feeds = [];
+
+  void getPosts() {
+    emit(GetPostFeedLoading());
+    FirebaseFirestore.instance.collection('posts').get().then((value) {
+      value.docs.forEach(
+        (element) {
+          feeds.add(FeedModel.fromJson(element.data()));
+        },
+      );
+
+      emit(GetPostFeedSuccess());
+    }).catchError((error) {
+      emit(GetPostFeedError(error.toString()));
+    });
   }
 }

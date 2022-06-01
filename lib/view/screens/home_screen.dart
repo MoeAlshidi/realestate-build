@@ -8,6 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 import '../../main.dart';
+import '../components/component.dart';
 import 'login_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -19,6 +20,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int activeIndex = 0;
+  int progressprecent = 0;
   List<String> items = [
     'Ahmed Project',
     'Ahmed Project',
@@ -31,6 +33,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text("Home"),
@@ -56,6 +59,33 @@ class _HomeScreenState extends State<HomeScreen> {
           },
           builder: (context, state) {
             HomeCubit homeCubit = HomeCubit.get(context);
+
+            void _showSheet() {
+              showModalBottomSheet(
+                isScrollControlled: true,
+                context: context,
+                builder: (context) {
+                  final GlobalKey<FormState> _dialogFormKey =
+                      GlobalKey<FormState>();
+                  final TextEditingController _textEditingController =
+                      TextEditingController();
+
+                  // this widget shows the Bottom Sheet for the Income.
+                  return SingleChildScrollView(
+                    child: BalanceBottomSheet(
+                        screenSize: screenSize,
+                        dialogFormKey: _dialogFormKey,
+                        textEditingController: _textEditingController,
+                        homeCubit: homeCubit),
+                  );
+                },
+              ).then((value) {
+                setState(() {
+                  progressprecent = value;
+                });
+              });
+            }
+
             return Column(
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -139,14 +169,25 @@ class _HomeScreenState extends State<HomeScreen> {
                 const SizedBox(
                   height: 30,
                 ),
-                const Padding(
-                  padding: EdgeInsets.only(left: 20),
-                  child: Text(
-                    'Project Progress',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
+                Padding(
+                  padding: const EdgeInsets.only(left: 20, right: 20),
+                  child: Row(
+                    children: [
+                      const Text(
+                        'Project Progress',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const Spacer(),
+                      IconButton(
+                        onPressed: () {
+                          _showSheet();
+                        },
+                        icon: const Icon(Icons.more_horiz),
+                      )
+                    ],
                   ),
                 ),
                 const SizedBox(
@@ -161,9 +202,10 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(15),
-                      child: const LinearProgressIndicator(
-                        value: 0.2,
-                        valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
+                      child: LinearProgressIndicator(
+                        value: progressprecent / 10,
+                        valueColor:
+                            const AlwaysStoppedAnimation<Color>(Colors.green),
                         backgroundColor: Colors.black12,
                       ),
                     ),
@@ -182,80 +224,133 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                 ),
+                const SizedBox(
+                  height: 20,
+                ),
                 Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Column(
-                    children: [
-                      Container(
-                        decoration: const BoxDecoration(
-                          borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(15),
-                            topRight: Radius.circular(15),
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        ConditionalBuilderRec(
+                          fallback: (context) =>
+                              const CircularProgressIndicator(),
+                          condition: state is! GetPostFeedLoading,
+                          builder: (context) => SizedBox(
+                            height: screenSize.height * 0.5,
+                            child: ListView.builder(
+                              itemCount: homeCubit.feeds.length,
+                              itemBuilder: ((context, index) => Column(
+                                    children: [
+                                      Card(
+                                        elevation: 5,
+                                        color: Colors.amber,
+                                        // decoration: const BoxDecoration(
+                                        //   borderRadius: BorderRadius.only(
+                                        //     topLeft: Radius.circular(15),
+                                        //     topRight: Radius.circular(15),
+                                        //   ),
+                                        //   color: Colors.black12,
+                                        // ),
+
+                                        child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            const SizedBox(
+                                              height: 2,
+                                            ),
+                                            Container(
+                                              padding: const EdgeInsets.only(
+                                                  left: 10,
+                                                  bottom: 20,
+                                                  top: 20),
+                                              decoration: const BoxDecoration(
+                                                  border: Border(
+                                                      bottom: BorderSide(
+                                                          width: 1.0,
+                                                          color: Colors.grey))),
+                                              width: double.infinity,
+                                              child: Text(
+                                                homeCubit.feeds[index].feed!,
+                                              ),
+                                            ),
+                                            const SizedBox(
+                                              height: 10,
+                                            ),
+                                            if (homeCubit
+                                                    .feeds[index].feedImages !=
+                                                '')
+                                              GestureDetector(
+                                                onTap: () {
+                                                  showDialog(
+                                                    context: context,
+                                                    builder:
+                                                        (BuildContext context) {
+                                                      return AlertDialog(
+                                                        content: Image.network(
+                                                          homeCubit.feeds[index]
+                                                              .feedImages!,
+                                                          fit: BoxFit.fill,
+                                                        ),
+                                                      );
+                                                    },
+                                                  );
+                                                },
+                                                child: SizedBox(
+                                                  width: double.infinity,
+                                                  height: 90,
+                                                  child: Image.network(
+                                                    homeCubit.feeds[index]
+                                                        .feedImages!,
+                                                    fit: BoxFit.cover,
+                                                  ),
+                                                ),
+                                              ),
+                                            SizedBox(
+                                              width: double.infinity,
+                                              height: 100,
+                                              child: Row(
+                                                children: [
+                                                  Padding(
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            left: 15),
+                                                    child: Container(
+                                                      width: 40,
+                                                      height: 40,
+                                                      decoration: BoxDecoration(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(50),
+                                                        image: DecorationImage(
+                                                          image: NetworkImage(
+                                                            homeCubit.userModel!
+                                                                .profileImage!,
+                                                          ),
+                                                          fit: BoxFit.fill,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      const SizedBox(
+                                        height: 20,
+                                      )
+                                    ],
+                                  )),
+                            ),
                           ),
-                          color: Colors.black12,
                         ),
-                        width: screenSize.width,
-                        height: 240,
-                      ),
-                      Container(
-                        width: screenSize.width,
-                        height: 50,
-                        decoration: const BoxDecoration(
-                          borderRadius: BorderRadius.only(
-                            bottomLeft: Radius.circular(15),
-                            bottomRight: Radius.circular(15),
-                          ),
-                          color: Colors.grey,
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.only(left: 8.0),
-                          child: Row(
-                            children: [
-                              ConditionalBuilderRec(
-                                fallback: (context) => Container(
-                                  width: 40,
-                                  height: 40,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(20),
-                                    color: Color(0xffC4C4C4),
-                                  ),
-                                ),
-                                condition: state is! GetDataLoading,
-                                builder: (context) => Container(
-                                  width: 40,
-                                  height: 40,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(20),
-                                    color: Colors.white,
-                                    image: DecorationImage(
-                                        image: NetworkImage(
-                                            '${homeCubit.userModel!.profileImage}'),
-                                        fit: BoxFit.cover),
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(
-                                width: 20,
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(bottom: 8.0),
-                                child: Container(
-                                  color: Colors.transparent,
-                                  width: screenSize.width * 0.7,
-                                  child: TextField(
-                                    controller: commentController,
-                                    decoration: const InputDecoration(
-                                      hintText: "Add Comment Here ....",
-                                      hintStyle: TextStyle(fontSize: 12),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      )
-                    ],
+                      ],
+                    ),
                   ),
                 )
               ],

@@ -34,6 +34,15 @@ class UploadProfileError extends HomeState {
   UploadProfileError(this.error);
 }
 
+class UploadPostFeedLoading extends HomeState {}
+
+class UploadPostFeedSuccess extends HomeState {}
+
+class UploadPostFeedError extends HomeState {
+  final String error;
+  UploadPostFeedError(this.error);
+}
+
 //create Post
 class PostFeedLoading extends HomeState {}
 
@@ -49,4 +58,21 @@ class GetImageSuccess extends HomeState {}
 class GetImageError extends HomeState {
   final String error;
   GetImageError(this.error);
+}
+
+class GetPostImageSuccess extends HomeState {}
+
+class GetPostImageError extends HomeState {
+  final String error;
+  GetPostImageError(this.error);
+}
+
+//get Posts
+class GetPostFeedLoading extends HomeState {}
+
+class GetPostFeedSuccess extends HomeState {}
+
+class GetPostFeedError extends HomeState {
+  final String error;
+  GetPostFeedError(this.error);
 }
