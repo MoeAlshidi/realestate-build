@@ -1,6 +1,10 @@
 import 'package:build/shared/cubit/home_cubit.dart';
+import 'package:build/view/screens/home_screen.dart';
+import 'package:flash/flash.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../components/constant.dart';
 
 class FeedScreen extends StatelessWidget {
   FeedScreen({Key? key}) : super(key: key);
@@ -9,7 +13,11 @@ class FeedScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<HomeCubit, HomeState>(
-      listener: (context, state) {},
+      listener: (context, state) {
+        if (state is UploadPostFeedSuccess || state is PostFeedSuccess) {
+          feedController.clear();
+        }
+      },
       builder: (context, state) {
         HomeCubit homeCubit = HomeCubit.get(context);
         return Scaffold(
@@ -18,7 +26,39 @@ class FeedScreen extends StatelessWidget {
             centerTitle: true,
             actions: [
               TextButton(
-                onPressed: () {},
+                onPressed: () {
+                  if (feedController.text.isNotEmpty) {
+                    homeCubit.postImagePath == null
+                        ? homeCubit.createPost(
+                            feed: feedController.text, date: DateTime.now())
+                        : homeCubit.uploadPostImage(
+                            feed: feedController.text, date: DateTime.now());
+                  } else {
+                    showFlash(
+                      context: context,
+                      duration: const Duration(seconds: 4),
+                      builder: (context, controller) {
+                        return Flash.bar(
+                          backgroundGradient: const LinearGradient(
+                            colors: [
+                              Color.fromARGB(255, 204, 82, 41),
+                              CustomColors.KredColor,
+                            ],
+                          ),
+                          controller: controller,
+                          useSafeArea: false,
+                          child: FlashBar(
+                            content: const Text(
+                              "Please fill in the field",
+                              style:
+                                  TextStyle(color: Colors.white, fontSize: 15),
+                            ),
+                          ),
+                        );
+                      },
+                    );
+                  }
+                },
                 child: const Text(
                   'Post',
                   style: TextStyle(color: Colors.white, fontSize: 20),
@@ -63,18 +103,13 @@ class FeedScreen extends StatelessWidget {
                   controller: feedController,
                   decoration: const InputDecoration(
                       hintText: 'Anything new regarding the project..'),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please fill in the field';
-                    } else {
-                      return null;
-                    }
-                  },
                 ),
                 Row(
                   children: [
                     IconButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        homeCubit.getPostImagePath();
+                      },
                       icon: const Icon(
                         Icons.image_outlined,
                         color: Colors.blue,
@@ -86,6 +121,17 @@ class FeedScreen extends StatelessWidget {
                     ),
                   ],
                 ),
+                if (homeCubit.postImagePath != null)
+                  Row(
+                    children: [
+                      SizedBox(
+                        width: 100,
+                        height: 100,
+                        child:
+                            Image(image: FileImage(homeCubit.postImagePath!)),
+                      ),
+                    ],
+                  ),
               ],
             ),
           ),
