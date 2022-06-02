@@ -29,7 +29,7 @@ class _HomeScreenState extends State<HomeScreen> {
     'Ahmed Project',
   ];
   String dropdownvalue = 'Choose Your Project';
-  final commentController = TextEditingController();
+  final List<TextEditingController> _controllers = [];
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
@@ -240,112 +240,140 @@ class _HomeScreenState extends State<HomeScreen> {
                             height: screenSize.height * 0.5,
                             child: ListView.builder(
                               itemCount: homeCubit.feeds.length,
-                              itemBuilder: ((context, index) => Column(
-                                    children: [
-                                      Card(
-                                        elevation: 5,
-                                        color: Colors.amber,
-                                        // decoration: const BoxDecoration(
-                                        //   borderRadius: BorderRadius.only(
-                                        //     topLeft: Radius.circular(15),
-                                        //     topRight: Radius.circular(15),
-                                        //   ),
-                                        //   color: Colors.black12,
-                                        // ),
+                              itemBuilder: ((context, index) {
+                                _controllers.add(TextEditingController());
+                                return Column(
+                                  children: [
+                                    Card(
+                                      elevation: 5,
 
-                                        child: Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.start,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            const SizedBox(
-                                              height: 2,
+                                      // decoration: const BoxDecoration(
+                                      //   borderRadius: BorderRadius.only(
+                                      //     topLeft: Radius.circular(15),
+                                      //     topRight: Radius.circular(15),
+                                      //   ),
+                                      //   color: Colors.black12,
+                                      // ),
+
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          const SizedBox(
+                                            height: 2,
+                                          ),
+                                          Container(
+                                            padding: const EdgeInsets.only(
+                                                left: 10, bottom: 20, top: 20),
+                                            decoration: const BoxDecoration(
+                                                border: Border(
+                                                    bottom: BorderSide(
+                                                        width: 1.0,
+                                                        color: Colors.grey))),
+                                            width: double.infinity,
+                                            child: Text(
+                                              homeCubit.feeds[index].feed!,
                                             ),
-                                            Container(
-                                              padding: const EdgeInsets.only(
-                                                  left: 10,
-                                                  bottom: 20,
-                                                  top: 20),
-                                              decoration: const BoxDecoration(
-                                                  border: Border(
-                                                      bottom: BorderSide(
-                                                          width: 1.0,
-                                                          color: Colors.grey))),
-                                              width: double.infinity,
-                                              child: Text(
-                                                homeCubit.feeds[index].feed!,
-                                              ),
-                                            ),
-                                            const SizedBox(
-                                              height: 10,
-                                            ),
-                                            if (homeCubit
-                                                    .feeds[index].feedImages !=
-                                                '')
-                                              GestureDetector(
-                                                onTap: () {
-                                                  showDialog(
-                                                    context: context,
-                                                    builder:
-                                                        (BuildContext context) {
-                                                      return AlertDialog(
-                                                        content: Image.network(
-                                                          homeCubit.feeds[index]
-                                                              .feedImages!,
-                                                          fit: BoxFit.fill,
-                                                        ),
-                                                      );
-                                                    },
-                                                  );
-                                                },
-                                                child: SizedBox(
-                                                  width: double.infinity,
-                                                  height: 90,
-                                                  child: Image.network(
-                                                    homeCubit.feeds[index]
-                                                        .feedImages!,
-                                                    fit: BoxFit.cover,
-                                                  ),
+                                          ),
+                                          const SizedBox(
+                                            height: 10,
+                                          ),
+                                          if (homeCubit
+                                                  .feeds[index].feedImages !=
+                                              '')
+                                            GestureDetector(
+                                              onTap: () {
+                                                showDialog(
+                                                  context: context,
+                                                  builder:
+                                                      (BuildContext context) {
+                                                    return AlertDialog(
+                                                      content: Image.network(
+                                                        homeCubit.feeds[index]
+                                                            .feedImages!,
+                                                        fit: BoxFit.fill,
+                                                      ),
+                                                    );
+                                                  },
+                                                );
+                                              },
+                                              child: SizedBox(
+                                                width: double.infinity,
+                                                height: 90,
+                                                child: Image.network(
+                                                  homeCubit
+                                                      .feeds[index].feedImages!,
+                                                  fit: BoxFit.cover,
                                                 ),
                                               ),
-                                            SizedBox(
-                                              width: double.infinity,
-                                              height: 100,
-                                              child: Row(
-                                                children: [
-                                                  Padding(
-                                                    padding:
-                                                        const EdgeInsets.only(
-                                                            left: 15),
-                                                    child: Container(
-                                                      width: 40,
-                                                      height: 40,
-                                                      decoration: BoxDecoration(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(50),
-                                                        image: DecorationImage(
-                                                          image: NetworkImage(
-                                                            homeCubit.userModel!
-                                                                .profileImage!,
-                                                          ),
-                                                          fit: BoxFit.fill,
+                                            ),
+                                          SizedBox(
+                                            width: double.infinity,
+                                            height: 100,
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          left: 15),
+                                                  child: Container(
+                                                    width: 40,
+                                                    height: 40,
+                                                    decoration: BoxDecoration(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              50),
+                                                      image: DecorationImage(
+                                                        image: NetworkImage(
+                                                          homeCubit.userModel!
+                                                              .profileImage!,
                                                         ),
+                                                        fit: BoxFit.fill,
                                                       ),
                                                     ),
                                                   ),
-                                                ],
-                                              ),
+                                                ),
+                                                SizedBox(
+                                                  width: screenSize.width * 0.6,
+                                                  child: TextFormField(
+                                                    controller:
+                                                        _controllers[index],
+                                                  ),
+                                                ),
+                                                IconButton(
+                                                    onPressed: () {
+                                                      homeCubit.comments
+                                                          .clear();
+                                                      homeCubit.comments.insert(
+                                                          0,
+                                                          _controllers[index]
+                                                              .text);
+                                                      homeCubit.sendComment(
+                                                        homeCubit.feeds[index]
+                                                            .feedId!,
+                                                      );
+                                                    },
+                                                    icon: const Icon(
+                                                      Icons.send,
+                                                      size: 14,
+                                                    ))
+                                              ],
                                             ),
-                                          ],
-                                        ),
+                                          ),
+                                        ],
                                       ),
-                                      const SizedBox(
-                                        height: 20,
-                                      )
-                                    ],
-                                  )),
+                                    ),
+                                    const SizedBox(
+                                      height: 20,
+                                    )
+                                  ],
+                                );
+                              }),
                             ),
                           ),
                         ),

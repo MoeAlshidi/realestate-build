@@ -26,6 +26,7 @@ class HomeCubit extends Cubit<HomeState> {
     const SettingsScreen(),
   ];
   int progress = 30;
+  List<String> comments = [];
   int currentIndex = 0;
   void currentScreen(int index) {
     currentIndex = index;
@@ -92,27 +93,39 @@ class HomeCubit extends Cubit<HomeState> {
     });
   }
 
-  void createPost({
+  Future<void> createPost({
     required String feed,
     String? image,
     required DateTime date,
-  }) {
+  }) async {
     FeedModel model = FeedModel(
-      id: token,
-      date: Timestamp.fromDate(date),
-      profileImage: userModel!.profileImage,
-      feed: feed,
-      feedImages: image,
-      name: '${userModel!.fname} ${userModel!.lname}',
-    );
-
+        id: token,
+        date: Timestamp.fromDate(date),
+        profileImage: userModel!.profileImage,
+        feed: feed,
+        feedImages: image,
+        name: '${userModel!.fname} ${userModel!.lname}',
+        comments: comments.isNotEmpty ? comments : [],
+        feedId: FirebaseFirestore.instance.collection('posts').doc().id);
     FirebaseFirestore.instance
         .collection('posts')
-        .add(model.toMap())
+        .doc(model.feedId)
+        .set(model.toMap())
         .then((value) {
       emit(PostFeedSuccess());
     }).catchError((error) {
       emit(PostFeedError(error.toString()));
+    });
+  }
+
+  void sendComment(String commentId) {
+    emit(SendCommentsLoading());
+    FirebaseFirestore.instance.collection('posts').doc(commentId).update({
+      'comments': comments,
+    }).then((value) {
+      emit(SendCommentsSuccess());
+    }).catchError((error) {
+      emit(SendCommentsError(error.toString()));
     });
   }
 

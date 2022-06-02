@@ -53,6 +53,16 @@ class PostFeedError extends HomeState {
   PostFeedError(this.error);
 }
 
+//send comments
+class SendCommentsLoading extends HomeState {}
+
+class SendCommentsSuccess extends HomeState {}
+
+class SendCommentsError extends HomeState {
+  final String error;
+  SendCommentsError(this.error);
+}
+
 class GetImageSuccess extends HomeState {}
 
 class GetImageError extends HomeState {
