@@ -30,7 +30,9 @@ class FeedScreen extends StatelessWidget {
                   if (feedController.text.isNotEmpty) {
                     homeCubit.postImagePath == null
                         ? homeCubit.createPost(
-                            feed: feedController.text, date: DateTime.now())
+                            feed: feedController.text,
+                            date: DateTime.now(),
+                            projectID: selectedProject)
                         : homeCubit.uploadPostImage(
                             feed: feedController.text, date: DateTime.now());
                   } else {

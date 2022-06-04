@@ -6,13 +6,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../components/component.dart' as components;
 
-class RegisterScreen extends StatelessWidget {
+class RegisterScreen extends StatefulWidget {
   RegisterScreen({Key? key}) : super(key: key);
+
+  @override
+  State<RegisterScreen> createState() => _RegisterScreenState();
+}
+
+class _RegisterScreenState extends State<RegisterScreen> {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
   final emailController = TextEditingController();
+
   final fNameController = TextEditingController();
+
   final lNameController = TextEditingController();
+
   final passwordController = TextEditingController();
 
   @override
@@ -99,6 +108,24 @@ class RegisterScreen extends StatelessWidget {
                               ),
                             ],
                           ),
+                        ),
+                        Row(
+                          children: [
+                            const Text(
+                              'Agent',
+                              style: TextStyle(
+                                  color: CustomColors.KmainColor,
+                                  fontSize: 17,
+                                  fontWeight: FontWeight.w500),
+                            ),
+                            Checkbox(
+                                value: loginCubit.isAgent,
+                                onChanged: (value) {
+                                  setState(() {
+                                    loginCubit.isAgent = value!;
+                                  });
+                                }),
+                          ],
                         ),
                         SizedBox(
                           height: screenSize.height * 0.05,

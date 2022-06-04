@@ -14,24 +14,27 @@ class Wrapper extends StatelessWidget {
         builder: (context, state) {
           HomeCubit homeCubit = HomeCubit.get(context);
           return Scaffold(
-            body: homeCubit.screenList[homeCubit.currentIndex],
+            body: homeCubit.userModel?.role == 'Agent'
+                ? homeCubit.screenListAgent[homeCubit.currentIndex]
+                : homeCubit.screenListCustomer[homeCubit.currentIndex],
             bottomNavigationBar: BottomNavigationBar(
               onTap: (value) => homeCubit.currentScreen(value),
               currentIndex: homeCubit.currentIndex,
-              items: const [
-                BottomNavigationBarItem(
+              items: [
+                const BottomNavigationBarItem(
                   icon: Icon(
                     Icons.home,
                   ),
                   label: 'Home',
                 ),
-                BottomNavigationBarItem(
-                  icon: Icon(
-                    Icons.add,
+                if (homeCubit.userModel?.role == 'Agent')
+                  const BottomNavigationBarItem(
+                    icon: Icon(
+                      Icons.add,
+                    ),
+                    label: 'Feeds',
                   ),
-                  label: 'Feeds',
-                ),
-                BottomNavigationBarItem(
+                const BottomNavigationBarItem(
                   icon: Icon(
                     Icons.settings,
                   ),

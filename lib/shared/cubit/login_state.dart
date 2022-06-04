@@ -31,6 +31,17 @@ class RegisterErrorState extends LoginState {
   RegisterErrorState(this.error);
 }
 
+//create Project
+class ProjectLoadingState extends LoginState {}
+
+class ProjectSuccessState extends LoginState {}
+
+class ProjectErrorState extends LoginState {
+  final String error;
+
+  ProjectErrorState(this.error);
+}
+
 class CreateUserLoadingState extends LoginState {}
 
 class CreateUserSuccessState extends LoginState {}

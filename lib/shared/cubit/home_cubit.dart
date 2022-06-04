@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:build/models/feed_model.dart';
+import 'package:build/models/project_model.dart';
 import 'package:build/models/user_model.dart';
 import 'package:build/view/components/constant.dart';
 import 'package:build/view/screens/feed_screen.dart';
@@ -20,9 +21,13 @@ class HomeCubit extends Cubit<HomeState> {
     return BlocProvider.of((context));
   }
 
-  List<Widget> screenList = [
+  List<Widget> screenListAgent = [
     HomeScreen(),
     FeedScreen(),
+    const SettingsScreen(),
+  ];
+  List<Widget> screenListCustomer = [
+    HomeScreen(),
     const SettingsScreen(),
   ];
   int progress = 30;
@@ -43,22 +48,82 @@ class HomeCubit extends Cubit<HomeState> {
         .get()
         .then((value) {
       userModel = UserModel.fromJson(value.data()!);
-      getPosts();
+
+      if (userModel!.role == 'Customer') {
+        getProject(id: userModel!.uId);
+      } else {
+        getProject();
+      }
+
       emit(GetDataSuccess());
     }).catchError((error) {
       emit(GetDataError(error.toString()));
     });
   }
 
-  void updateUserData() {
-    emit(UpdateDataLoading());
+  // List<String> projectNameList = [];
+  // List<ProjectModel> projects = [];
+  ProjectModel? projectModel;
+  void getProject({
+    String? id,
+  }) {
+    emit(GetProjectLoading());
+    if (id != null) {
+      FirebaseFirestore.instance
+          .collection('Projects')
+          .doc(id)
+          .get()
+          .then((value) {
+        projectModel = ProjectModel.fromJson(value.data()!);
+        print(projectModel);
+        getPosts(projectId: selectedProject);
+        emit(GetProjectSuccess());
+      }).catchError((error) {
+        emit(GetProjectError(error.toString()));
+      });
+    } else {
+      FirebaseFirestore.instance.collection('Projects').get().then((value) {
+        value.docs.forEach((element) {
+          ProjectModel project = ProjectModel(
+            username: element.data()['username'],
+            projectId: element.data()['projectId'],
+          );
+
+          projects.add(project);
+        });
+        print(projects);
+
+        emit(GetProjectSuccess());
+      }).catchError((error) {
+        emit(GetProjectError(error.toString()));
+      });
+    }
+  }
+
+  void updateUserImage() {
+    emit(UpdateImageLoading());
     FirebaseFirestore.instance.collection('User').doc(token).update({
       'imageProfile': profileImageUrl,
     }).then((value) {
-      emit(UpdateDataSuccess());
+      emit(UpdateImageSuccess());
       print("done");
     }).catchError((error) {
-      emit(UpdateDataError(error.toString()));
+      emit(UpdateImageError(error.toString()));
+    });
+  }
+
+  void updateProgress({
+    required double progress,
+    required String ProjectId,
+  }) {
+    emit(UpdateImageLoading());
+    FirebaseFirestore.instance
+        .collection('Projects')
+        .doc(ProjectId)
+        .update({'progress': progress}).then((value) {
+      emit(UpdateImageSuccess());
+    }).catchError((error) {
+      emit(UpdateImageError(error.toString()));
     });
   }
 
@@ -85,7 +150,8 @@ class HomeCubit extends Cubit<HomeState> {
         .then((value) {
       value.ref.getDownloadURL().then((value) {
         postImageUrl = value;
-        createPost(feed: feed, date: date, image: value);
+        createPost(
+            feed: feed, date: date, image: value, projectID: selectedProject);
         emit(UploadPostFeedSuccess());
       });
     }).catchError((error) {
@@ -95,6 +161,7 @@ class HomeCubit extends Cubit<HomeState> {
 
   Future<void> createPost({
     required String feed,
+    required String projectID,
     String? image,
     required DateTime date,
   }) async {
@@ -106,9 +173,11 @@ class HomeCubit extends Cubit<HomeState> {
         feedImages: image,
         name: '${userModel!.fname} ${userModel!.lname}',
         comments: comments.isNotEmpty ? comments : [],
-        feedId: FirebaseFirestore.instance.collection('posts').doc().id);
+        feedId: projectID);
     FirebaseFirestore.instance
-        .collection('posts')
+        .collection('Projects')
+        .doc(projectID)
+        .collection('Feeds')
         .doc(model.feedId)
         .set(model.toMap())
         .then((value) {
@@ -118,9 +187,14 @@ class HomeCubit extends Cubit<HomeState> {
     });
   }
 
-  void sendComment(String commentId) {
+  void sendComment({required String commentId, required String projectId}) {
     emit(SendCommentsLoading());
-    FirebaseFirestore.instance.collection('posts').doc(commentId).set({
+    FirebaseFirestore.instance
+        .collection('Projects')
+        .doc(projectId)
+        .collection('Feeds')
+        .doc(commentId)
+        .set({
       'comments': comments,
     }, SetOptions(merge: true)).then((value) {
       emit(SendCommentsSuccess());
@@ -139,7 +213,7 @@ class HomeCubit extends Cubit<HomeState> {
       value.ref.getDownloadURL().then((value) {
         profileImageUrl = value;
         emit(UploadProfileSuccess());
-        updateUserData();
+        updateUserImage();
       });
     }).catchError((error) {
       emit(UploadProfileError(error.toString()));
@@ -162,15 +236,27 @@ class HomeCubit extends Cubit<HomeState> {
 
   List<FeedModel> feeds = [];
 
-  void getPosts() {
+  void getPosts({
+    required String projectId,
+  }) {
+    feeds.clear();
     emit(GetPostFeedLoading());
-    FirebaseFirestore.instance.collection('posts').get().then((value) {
+    print('HEllo');
+    print(selectedProject);
+    FirebaseFirestore.instance
+        .collection('Projects')
+        .doc(selectedProject)
+        .collection('Feeds')
+        .get()
+        .then((value) {
+      print(value.docs.length);
       value.docs.forEach(
         (element) {
           feeds.add(FeedModel.fromJson(element.data()));
         },
       );
-
+      print(feeds);
+      print('HII');
       emit(GetPostFeedSuccess());
     }).catchError((error) {
       emit(GetPostFeedError(error.toString()));

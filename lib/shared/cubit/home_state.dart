@@ -16,14 +16,25 @@ class GetDataError extends HomeState {
   GetDataError(this.error);
 }
 
-//update user data
-class UpdateDataLoading extends HomeState {}
+//Get Project
 
-class UpdateDataSuccess extends HomeState {}
+class GetProjectLoading extends HomeState {}
 
-class UpdateDataError extends HomeState {
+class GetProjectSuccess extends HomeState {}
+
+class GetProjectError extends HomeState {
   final String error;
-  UpdateDataError(this.error);
+  GetProjectError(this.error);
+}
+
+//update user data
+class UpdateImageLoading extends HomeState {}
+
+class UpdateImageSuccess extends HomeState {}
+
+class UpdateImageError extends HomeState {
+  final String error;
+  UpdateImageError(this.error);
 }
 
 //Upload Profile
@@ -85,4 +96,14 @@ class GetPostFeedSuccess extends HomeState {}
 class GetPostFeedError extends HomeState {
   final String error;
   GetPostFeedError(this.error);
+}
+
+//update progress
+class UpdateProgressLoading extends HomeState {}
+
+class UpdateProgressSuccess extends HomeState {}
+
+class UpdateProgressError extends HomeState {
+  final String error;
+  UpdateProgressError(this.error);
 }

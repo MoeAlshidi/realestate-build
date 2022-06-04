@@ -7,7 +7,7 @@ class UserModel {
   String? email;
   String? role;
   String? profileImage;
-  List<ProjectModel>? projectModel;
+  String? projectId;
 
   UserModel({
     this.uId,
@@ -16,12 +16,10 @@ class UserModel {
     this.email,
     this.role,
     this.profileImage,
-    this.projectModel,
+    this.projectId,
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
-    List<ProjectModel> projects = List<ProjectModel>.from(
-        json["projects"]?.map((x) => ProjectModel.fromJson(x)) ?? []);
     return UserModel(
       email: json['email'],
       uId: json['uId'],
@@ -29,7 +27,7 @@ class UserModel {
       lname: json['lname'],
       role: json['role'],
       profileImage: json['imageProfile'],
-      projectModel: projects,
+      projectId: json['projectId'],
     );
   }
   Map<String, dynamic> toMap() {
@@ -40,7 +38,7 @@ class UserModel {
       'email': email,
       'role': role,
       'imageProfile': profileImage,
-      'projects': projectModel,
+      'projectId': projectId,
     };
   }
 }

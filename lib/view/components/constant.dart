@@ -1,3 +1,4 @@
+import 'package:build/models/project_model.dart';
 import 'package:flutter/material.dart';
 
 class CustomColors {
@@ -24,6 +25,8 @@ class CustomTextStyle {
 }
 
 String token = '';
+String selectedProject = '';
+List<ProjectModel> projects = [];
 
 List<String> images = [
   'https://www.constructionweekonline.com/cloud/2021/07/07/idealmed-hospital-muscat-1.jpg',
