@@ -120,9 +120,9 @@ class HomeCubit extends Cubit<HomeState> {
 
   void sendComment(String commentId) {
     emit(SendCommentsLoading());
-    FirebaseFirestore.instance.collection('posts').doc(commentId).update({
+    FirebaseFirestore.instance.collection('posts').doc(commentId).set({
       'comments': comments,
-    }).then((value) {
+    }, SetOptions(merge: true)).then((value) {
       emit(SendCommentsSuccess());
     }).catchError((error) {
       emit(SendCommentsError(error.toString()));
