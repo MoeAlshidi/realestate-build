@@ -246,15 +246,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                   children: [
                                     Card(
                                       elevation: 5,
-
-                                      // decoration: const BoxDecoration(
-                                      //   borderRadius: BorderRadius.only(
-                                      //     topLeft: Radius.circular(15),
-                                      //     topRight: Radius.circular(15),
-                                      //   ),
-                                      //   color: Colors.black12,
-                                      // ),
-
                                       child: Column(
                                         mainAxisAlignment:
                                             MainAxisAlignment.start,
