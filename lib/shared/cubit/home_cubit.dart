@@ -61,8 +61,6 @@ class HomeCubit extends Cubit<HomeState> {
     });
   }
 
-  // List<String> projectNameList = [];
-  // List<ProjectModel> projects = [];
   ProjectModel? projectModel;
   void getProject({
     String? id,
@@ -75,7 +73,10 @@ class HomeCubit extends Cubit<HomeState> {
           .get()
           .then((value) {
         projectModel = ProjectModel.fromJson(value.data()!);
-        print(projectModel);
+        print(projectModel!.progress!);
+        progressprecent = (projectModel!.progress!);
+        print(progressprecent);
+
         getPosts(projectId: selectedProject);
         emit(GetProjectSuccess());
       }).catchError((error) {
@@ -91,7 +92,6 @@ class HomeCubit extends Cubit<HomeState> {
 
           projects.add(project);
         });
-        print(projects);
 
         emit(GetProjectSuccess());
       }).catchError((error) {
@@ -106,7 +106,6 @@ class HomeCubit extends Cubit<HomeState> {
       'imageProfile': profileImageUrl,
     }).then((value) {
       emit(UpdateImageSuccess());
-      print("done");
     }).catchError((error) {
       emit(UpdateImageError(error.toString()));
     });
@@ -114,12 +113,12 @@ class HomeCubit extends Cubit<HomeState> {
 
   void updateProgress({
     required double progress,
-    required String ProjectId,
+    required String projectId,
   }) {
     emit(UpdateImageLoading());
     FirebaseFirestore.instance
         .collection('Projects')
-        .doc(ProjectId)
+        .doc(projectId)
         .update({'progress': progress}).then((value) {
       emit(UpdateImageSuccess());
     }).catchError((error) {

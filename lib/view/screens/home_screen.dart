@@ -20,7 +20,6 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int activeIndex = 0;
-  int progressprecent = 0;
   List<DropdownMenuItem<String>> projectNameList = [];
   void fillProjects() {
     projectNameList.clear();
@@ -84,10 +83,12 @@ class _HomeScreenState extends State<HomeScreen> {
             // TODO: implement listener
             if (state is GetProjectSuccess) {
               fillProjects();
+              print("This is on Restart $progressprecent");
             }
           },
           builder: (context, state) {
             HomeCubit homeCubit = HomeCubit.get(context);
+            // homeCubit.projectModel!.progress = progressprecent;
 
             void _showSheet() {
               showModalBottomSheet(
@@ -112,8 +113,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 setState(() {
                   progressprecent = value;
                   homeCubit.updateProgress(
-                      ProjectId: dropdownvalue!,
-                      progress: progressprecent / 10);
+                    projectId: dropdownvalue!,
+                    progress: progressprecent,
+                  );
                 });
               });
             }
@@ -247,8 +249,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(15),
                             child: LinearProgressIndicator(
-                              value: homeCubit.projectModel?.progress ??
-                                  progressprecent / 10,
+                              value: progressprecent / 10,
                               valueColor: const AlwaysStoppedAnimation<Color>(
                                   Colors.green),
                               backgroundColor: Colors.black12,

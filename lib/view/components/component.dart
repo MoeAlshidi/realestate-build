@@ -207,7 +207,7 @@ class _BalanceBottomSheetState extends State<BalanceBottomSheet> {
                         ],
                         onSelectedItemChanged: (int index) {
                           setState(() {
-                            widget.homeCubit.progress = index + 1;
+                            widget.homeCubit.projectModel?.progress = index + 1;
                           });
                         },
                       ),
@@ -240,9 +240,10 @@ class _BalanceBottomSheetState extends State<BalanceBottomSheet> {
                       ),
                       onPressed: () {
                         // homeCubit.updateIncomeDay();
-                        print(widget.homeCubit.progress);
+                        // print(widget.homeCubit.projectModel?.progress);
 
-                        Navigator.pop(context, widget.homeCubit.progress);
+                        Navigator.pop(
+                            context, widget.homeCubit.projectModel?.progress);
                       },
                       child: const Text(
                         'Ok',

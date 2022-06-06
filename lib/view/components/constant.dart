@@ -25,6 +25,7 @@ class CustomTextStyle {
 }
 
 String token = '';
+double progressprecent = 0.0;
 String selectedProject = '';
 List<ProjectModel> projects = [];
 
