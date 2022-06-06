@@ -48,7 +48,7 @@ class HomeCubit extends Cubit<HomeState> {
         .get()
         .then((value) {
       userModel = UserModel.fromJson(value.data()!);
-
+      selectedProject = userModel!.projectId!;
       if (userModel!.role == 'Customer') {
         getProject(id: userModel!.uId);
       } else {
