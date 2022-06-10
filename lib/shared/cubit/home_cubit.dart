@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:build/models/comment_model.dart';
 import 'package:build/models/feed_model.dart';
 import 'package:build/models/project_model.dart';
 import 'package:build/models/user_model.dart';
@@ -31,7 +32,7 @@ class HomeCubit extends Cubit<HomeState> {
     const SettingsScreen(),
   ];
   int progress = 30;
-  List<String> comments = [];
+
   int currentIndex = 0;
   void currentScreen(int index) {
     currentIndex = index;
@@ -78,6 +79,7 @@ class HomeCubit extends Cubit<HomeState> {
         print(progressprecent);
 
         getPosts(projectId: selectedProject);
+        getComments();
         emit(GetProjectSuccess());
       }).catchError((error) {
         emit(GetProjectError(error.toString()));
@@ -171,7 +173,6 @@ class HomeCubit extends Cubit<HomeState> {
         feed: feed,
         feedImages: image,
         name: '${userModel!.fname} ${userModel!.lname}',
-        comments: comments.isNotEmpty ? comments : [],
         feedId: projectID);
     FirebaseFirestore.instance
         .collection('Projects')
@@ -186,19 +187,55 @@ class HomeCubit extends Cubit<HomeState> {
     });
   }
 
-  void sendComment({required String commentId, required String projectId}) {
+  void sendComment({
+    required String commentId,
+    required String projectId,
+    required String userComment,
+  }) {
+    Comment comment = Comment(
+      id: projectId,
+      userId: commentId,
+      profileImage: userModel!.profileImage as String,
+      comment: userComment,
+      date: Timestamp.fromDate(DateTime.now()),
+    );
+
     emit(SendCommentsLoading());
     FirebaseFirestore.instance
         .collection('Projects')
         .doc(projectId)
         .collection('Feeds')
         .doc(commentId)
-        .set({
-      'comments': comments,
-    }, SetOptions(merge: true)).then((value) {
+        .collection('Comments')
+        .add(comment.toMap())
+        .then((value) {
       emit(SendCommentsSuccess());
     }).catchError((error) {
       emit(SendCommentsError(error.toString()));
+    });
+  }
+
+  List<Comment> commentList = [];
+  void getComments() {
+    commentList.clear();
+    emit(GetCommentsLoading());
+    FirebaseFirestore.instance
+        .collection('Projects')
+        .doc(selectedProject)
+        .collection('Feeds')
+        .doc(selectedProject)
+        .collection('Comments')
+        .get()
+        .then((value) {
+      value.docs.forEach(
+        (element) {
+          commentList.add(Comment.fromJson(element.data()));
+        },
+      );
+      emit(GetCommentsSuccess());
+    }).catchError((error) {
+      emit(GetCommentsError(error.toString()));
+      print(error);
     });
   }
 
@@ -254,7 +291,6 @@ class HomeCubit extends Cubit<HomeState> {
           feeds.add(FeedModel.fromJson(element.data()));
         },
       );
-      print(feeds);
       print('HII');
       emit(GetPostFeedSuccess());
     }).catchError((error) {

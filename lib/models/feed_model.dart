@@ -8,7 +8,7 @@ class FeedModel {
   Timestamp? date;
   String? feedImages;
   String? profileImage;
-  List<String>? comments;
+
   FeedModel({
     this.id,
     this.feedId,
@@ -17,7 +17,6 @@ class FeedModel {
     this.feed,
     this.feedImages,
     this.profileImage,
-    this.comments,
   });
   FeedModel.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -27,7 +26,6 @@ class FeedModel {
     date = json['date'];
     profileImage = json['profileImage'] ?? '';
     feedImages = json['feedImages'] ?? '';
-    comments = List.from(json['comments']);
   }
   Map<String, dynamic> toMap() {
     return {
@@ -38,7 +36,6 @@ class FeedModel {
       'date': date,
       'feedImages': feedImages,
       'profileImage': profileImage,
-      'comments': comments,
     };
   }
 }

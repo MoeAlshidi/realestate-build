@@ -360,7 +360,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                                           child: SizedBox(
                                                             width:
                                                                 double.infinity,
-                                                            height: 90,
                                                             child:
                                                                 Image.network(
                                                               homeCubit
@@ -369,6 +368,52 @@ class _HomeScreenState extends State<HomeScreen> {
                                                               fit: BoxFit.cover,
                                                             ),
                                                           ),
+                                                        ),
+                                                      if (homeCubit.commentList
+                                                          .isNotEmpty)
+                                                        SizedBox(
+                                                          width:
+                                                              double.infinity,
+                                                          height: 50,
+                                                          child:
+                                                              ListView.builder(
+                                                                  itemCount: homeCubit
+                                                                      .commentList
+                                                                      .length,
+                                                                  itemBuilder:
+                                                                      (context,
+                                                                          index) {
+                                                                    var commentIndex =
+                                                                        homeCubit
+                                                                            .commentList[index];
+                                                                    return SizedBox(
+                                                                      child:
+                                                                          Row(
+                                                                        children: [
+                                                                          Container(
+                                                                            width:
+                                                                                40,
+                                                                            height:
+                                                                                40,
+                                                                            decoration:
+                                                                                BoxDecoration(
+                                                                              borderRadius: BorderRadius.circular(50),
+                                                                              image: DecorationImage(
+                                                                                image: NetworkImage(
+                                                                                  commentIndex.profileImage,
+                                                                                ),
+                                                                                fit: BoxFit.fill,
+                                                                              ),
+                                                                            ),
+                                                                          ),
+                                                                          SizedBox(
+                                                                            child:
+                                                                                Text(commentIndex.comment),
+                                                                          ),
+                                                                        ],
+                                                                      ),
+                                                                    );
+                                                                  }),
                                                         ),
                                                       SizedBox(
                                                         width: double.infinity,
@@ -420,15 +465,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                                             IconButton(
                                                                 onPressed: () {
                                                                   homeCubit
-                                                                      .comments
-                                                                      .clear();
-                                                                  homeCubit
-                                                                      .comments
-                                                                      .insert(
-                                                                          0,
-                                                                          _controllers[index]
-                                                                              .text);
-                                                                  homeCubit
                                                                       .sendComment(
                                                                     commentId: homeCubit
                                                                         .feeds[
@@ -436,6 +472,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                                                         .feedId!,
                                                                     projectId:
                                                                         selectedProject,
+                                                                    userComment:
+                                                                        _controllers[index]
+                                                                            .text,
                                                                   );
                                                                 },
                                                                 icon:

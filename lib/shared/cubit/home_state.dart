@@ -74,6 +74,16 @@ class SendCommentsError extends HomeState {
   SendCommentsError(this.error);
 }
 
+//get Coments
+class GetCommentsLoading extends HomeState {}
+
+class GetCommentsSuccess extends HomeState {}
+
+class GetCommentsError extends HomeState {
+  final String error;
+  GetCommentsError(this.error);
+}
+
 class GetImageSuccess extends HomeState {}
 
 class GetImageError extends HomeState {
