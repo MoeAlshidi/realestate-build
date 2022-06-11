@@ -21,6 +21,7 @@ class HomeCubit extends Cubit<HomeState> {
   static HomeCubit get(BuildContext context) {
     return BlocProvider.of((context));
   }
+  // this is new master
 
   List<Widget> screenListAgent = [
     HomeScreen(),
