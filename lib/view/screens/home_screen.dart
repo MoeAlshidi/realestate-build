@@ -3,6 +3,7 @@ import 'package:build/view/components/constant.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:conditional_builder_rec/conditional_builder_rec.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
@@ -45,12 +46,6 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     fillProjects();
   }
-  // void currentProject(String value) {
-  //   projects.where((element) {
-  //     print(element.username == value);
-  //     return element.username == value;
-  //   });
-  // }
 
   List<Map<String, dynamic>> projectMap = [];
 
@@ -83,12 +78,15 @@ class _HomeScreenState extends State<HomeScreen> {
             // TODO: implement listener
             if (state is GetProjectSuccess) {
               fillProjects();
-              print("This is on Restart $progressprecent");
+            }
+            if (state is UploadProjectImageSuccess) {
+              setState(() {
+                images = state.urlList;
+              });
             }
           },
           builder: (context, state) {
             HomeCubit homeCubit = HomeCubit.get(context);
-            // homeCubit.projectModel!.progress = progressprecent;
 
             void _showSheet() {
               showModalBottomSheet(
@@ -151,7 +149,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                   dropdownvalue = newValue!;
                                   selectedProject = dropdownvalue!;
                                   homeCubit.getProject(id: dropdownvalue);
-                                  print(selectedProject);
                                 });
                               },
                             ),
@@ -170,32 +167,51 @@ class _HomeScreenState extends State<HomeScreen> {
                     builder: (context) => Column(children: [
                       Column(
                         children: [
-                          CarouselSlider.builder(
-                            itemCount: images.length,
-                            itemBuilder: (context, index, realIndex) {
-                              final urlImage = images[index];
-                              return Container(
-                                margin: const EdgeInsets.only(left: 15),
-                                width: screenSize.width * 0.9,
-                                height: 200,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(15),
-                                  color: Colors.black12,
-                                  image: DecorationImage(
-                                    image: NetworkImage(urlImage),
-                                    fit: BoxFit.fill,
-                                  ),
+                          ConditionalBuilderRec(
+                            condition: images.isNotEmpty,
+                            fallback: (context) => Container(
+                              margin: const EdgeInsets.only(left: 15),
+                              width: screenSize.width * 0.9,
+                              height: 200,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(15),
+                                color: Colors.black12,
+                              ),
+                              child: Center(
+                                  child: IconButton(
+                                icon: const Icon(
+                                  Icons.add,
                                 ),
-                              );
-                            },
-                            options: CarouselOptions(
-                                height: 200,
-                                enableInfiniteScroll: false,
-                                onPageChanged: (index, reason) {
-                                  setState(() {
-                                    activeIndex = index;
-                                  });
-                                }),
+                                onPressed: () {},
+                              )),
+                            ),
+                            builder: (context) => CarouselSlider.builder(
+                              itemCount: images.length,
+                              itemBuilder: (context, index, realIndex) {
+                                final urlImage = images[index];
+                                return Container(
+                                  margin: const EdgeInsets.only(left: 15),
+                                  width: screenSize.width * 0.9,
+                                  height: 200,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(15),
+                                    color: Colors.black12,
+                                    image: DecorationImage(
+                                      image: NetworkImage(urlImage),
+                                      fit: BoxFit.fill,
+                                    ),
+                                  ),
+                                );
+                              },
+                              options: CarouselOptions(
+                                  height: 200,
+                                  enableInfiniteScroll: false,
+                                  onPageChanged: (index, reason) {
+                                    setState(() {
+                                      activeIndex = index;
+                                    });
+                                  }),
+                            ),
                           ),
                           const SizedBox(
                             height: 15,
@@ -239,24 +255,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       const SizedBox(
                         height: 10,
                       ),
-                      Center(
-                        child: Container(
-                          width: screenSize.width * 0.8,
-                          height: 20,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(15),
-                          ),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(15),
-                            child: LinearProgressIndicator(
-                              value: progressprecent / 10,
-                              valueColor: const AlwaysStoppedAnimation<Color>(
-                                  Colors.green),
-                              backgroundColor: Colors.black12,
-                            ),
-                          ),
-                        ),
-                      ),
+                      ProgressIndicator(screenSize: screenSize),
                       const SizedBox(
                         height: 20,
                       ),
@@ -288,7 +287,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               ConditionalBuilderRec(
                                 fallback: (context) =>
                                     const CircularProgressIndicator(),
-                                condition: homeCubit.feeds.isNotEmpty,
+                                condition: state is! GetPostFeedLoading,
                                 builder: (context) => homeCubit.feeds.isNotEmpty
                                     ? SizedBox(
                                         height: screenSize.height * 0.5,
@@ -297,202 +296,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                           itemBuilder: ((context, index) {
                                             _controllers
                                                 .add(TextEditingController());
-                                            return Column(
-                                              children: [
-                                                Card(
-                                                  elevation: 5,
-                                                  child: Column(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment.start,
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
-                                                    children: [
-                                                      const SizedBox(
-                                                        height: 2,
-                                                      ),
-                                                      Container(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                    .only(
-                                                                left: 10,
-                                                                bottom: 20,
-                                                                top: 20),
-                                                        decoration: const BoxDecoration(
-                                                            border: Border(
-                                                                bottom: BorderSide(
-                                                                    width: 1.0,
-                                                                    color: Colors
-                                                                        .grey))),
-                                                        width: double.infinity,
-                                                        child: Text(
-                                                          homeCubit.feeds[index]
-                                                              .feed!,
-                                                        ),
-                                                      ),
-                                                      const SizedBox(
-                                                        height: 10,
-                                                      ),
-                                                      if (homeCubit.feeds[index]
-                                                              .feedImages !=
-                                                          '')
-                                                        GestureDetector(
-                                                          onTap: () {
-                                                            showDialog(
-                                                              context: context,
-                                                              builder:
-                                                                  (BuildContext
-                                                                      context) {
-                                                                return AlertDialog(
-                                                                  content: Image
-                                                                      .network(
-                                                                    homeCubit
-                                                                        .feeds[
-                                                                            index]
-                                                                        .feedImages!,
-                                                                    fit: BoxFit
-                                                                        .fill,
-                                                                  ),
-                                                                );
-                                                              },
-                                                            );
-                                                          },
-                                                          child: SizedBox(
-                                                            width:
-                                                                double.infinity,
-                                                            child:
-                                                                Image.network(
-                                                              homeCubit
-                                                                  .feeds[index]
-                                                                  .feedImages!,
-                                                              fit: BoxFit.cover,
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      if (homeCubit.commentList
-                                                          .isNotEmpty)
-                                                        SizedBox(
-                                                          width:
-                                                              double.infinity,
-                                                          height: 50,
-                                                          child:
-                                                              ListView.builder(
-                                                                  itemCount: homeCubit
-                                                                      .commentList
-                                                                      .length,
-                                                                  itemBuilder:
-                                                                      (context,
-                                                                          index) {
-                                                                    var commentIndex =
-                                                                        homeCubit
-                                                                            .commentList[index];
-                                                                    return SizedBox(
-                                                                      child:
-                                                                          Row(
-                                                                        children: [
-                                                                          Container(
-                                                                            width:
-                                                                                40,
-                                                                            height:
-                                                                                40,
-                                                                            decoration:
-                                                                                BoxDecoration(
-                                                                              borderRadius: BorderRadius.circular(50),
-                                                                              image: DecorationImage(
-                                                                                image: NetworkImage(
-                                                                                  commentIndex.profileImage,
-                                                                                ),
-                                                                                fit: BoxFit.fill,
-                                                                              ),
-                                                                            ),
-                                                                          ),
-                                                                          SizedBox(
-                                                                            child:
-                                                                                Text(commentIndex.comment),
-                                                                          ),
-                                                                        ],
-                                                                      ),
-                                                                    );
-                                                                  }),
-                                                        ),
-                                                      SizedBox(
-                                                        width: double.infinity,
-                                                        height: 100,
-                                                        child: Row(
-                                                          mainAxisAlignment:
-                                                              MainAxisAlignment
-                                                                  .spaceBetween,
-                                                          children: [
-                                                            Padding(
-                                                              padding:
-                                                                  const EdgeInsets
-                                                                          .only(
-                                                                      left: 15),
-                                                              child: Container(
-                                                                width: 40,
-                                                                height: 40,
-                                                                decoration:
-                                                                    BoxDecoration(
-                                                                  borderRadius:
-                                                                      BorderRadius
-                                                                          .circular(
-                                                                              50),
-                                                                  image:
-                                                                      DecorationImage(
-                                                                    image:
-                                                                        NetworkImage(
-                                                                      homeCubit
-                                                                          .userModel!
-                                                                          .profileImage!,
-                                                                    ),
-                                                                    fit: BoxFit
-                                                                        .fill,
-                                                                  ),
-                                                                ),
-                                                              ),
-                                                            ),
-                                                            SizedBox(
-                                                              width: screenSize
-                                                                      .width *
-                                                                  0.6,
-                                                              child:
-                                                                  TextFormField(
-                                                                controller:
-                                                                    _controllers[
-                                                                        index],
-                                                              ),
-                                                            ),
-                                                            IconButton(
-                                                                onPressed: () {
-                                                                  homeCubit
-                                                                      .sendComment(
-                                                                    commentId: homeCubit
-                                                                        .feeds[
-                                                                            index]
-                                                                        .feedId!,
-                                                                    projectId:
-                                                                        selectedProject,
-                                                                    userComment:
-                                                                        _controllers[index]
-                                                                            .text,
-                                                                  );
-                                                                },
-                                                                icon:
-                                                                    const Icon(
-                                                                  Icons.send,
-                                                                  size: 14,
-                                                                ))
-                                                          ],
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                                const SizedBox(
-                                                  height: 20,
-                                                )
-                                              ],
-                                            );
+                                            return FeedWidget(
+                                                index: index,
+                                                homeCubit: homeCubit,
+                                                screenSize: screenSize,
+                                                controllers: _controllers);
                                           }),
                                         ),
                                       )
@@ -510,6 +318,226 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             );
           },
+        ),
+      ),
+    );
+  }
+}
+
+class ProgressIndicator extends StatelessWidget {
+  const ProgressIndicator({
+    Key? key,
+    required this.screenSize,
+  }) : super(key: key);
+
+  final Size screenSize;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Container(
+        width: screenSize.width * 0.8,
+        height: 20,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(15),
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(15),
+          child: LinearProgressIndicator(
+            value: progressprecent / 10,
+            valueColor: const AlwaysStoppedAnimation<Color>(Colors.green),
+            backgroundColor: Colors.black12,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class FeedWidget extends StatelessWidget {
+  FeedWidget({
+    Key? key,
+    required this.index,
+    required this.homeCubit,
+    required this.screenSize,
+    required List<TextEditingController> controllers,
+  })  : _controllers = controllers,
+        super(key: key);
+
+  final HomeCubit homeCubit;
+  final Size screenSize;
+  final int index;
+  final List<TextEditingController> _controllers;
+
+  List<dynamic> commentsLists = [];
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 10.0),
+        child: Column(
+          children: [
+            Card(
+              elevation: 5,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(
+                    height: 2,
+                  ),
+                  Container(
+                    padding:
+                        const EdgeInsets.only(left: 10, bottom: 20, top: 20),
+                    child: Text(
+                      homeCubit.feeds[index].feed!,
+                      style: const TextStyle(color: CustomColors.KmainColor),
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  if (homeCubit.feeds[index].feedImages != '')
+                    GestureDetector(
+                      onTap: () {
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              content: Image.network(
+                                homeCubit.feeds[index].feedImages!,
+                                fit: BoxFit.fill,
+                              ),
+                            );
+                          },
+                        );
+                      },
+                      child: SizedBox(
+                        width: double.infinity,
+                        height: screenSize.height * 0.3,
+                        child: Image.network(
+                          homeCubit.feeds[index].feedImages!,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
+                  if (homeCubit.feeds[index].comments!.isNotEmpty)
+                    SizedBox(
+                      height: homeCubit.feeds[index].comments!.length < 2
+                          ? screenSize.height * 0.08
+                          : screenSize.height * 0.2,
+                      child: ListView.builder(
+                          itemCount: homeCubit.feeds[index].comments!.length,
+                          itemBuilder: (context, index) {
+                            return CommentWidget(
+                              comments:
+                                  homeCubit.feeds[this.index].comments![index],
+                            );
+                          }),
+                    ),
+                  if (homeCubit.feeds[index].comments!.length < 2)
+                    SizedBox(
+                      width: double.infinity,
+                      height: 100,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(left: 15),
+                            child: Container(
+                              width: 40,
+                              height: 40,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(50),
+                                image: DecorationImage(
+                                  image: NetworkImage(
+                                    homeCubit.userModel!.profileImage!,
+                                  ),
+                                  fit: BoxFit.fill,
+                                ),
+                              ),
+                            ),
+                          ),
+                          SizedBox(
+                            width: screenSize.width * 0.6,
+                            child: TextFormField(
+                              controller: _controllers[index],
+                            ),
+                          ),
+                          IconButton(
+                              onPressed: () {
+                                homeCubit.sendComment(
+                                  commentId: homeCubit.feeds[index].feedId!,
+                                  projectId: selectedProject,
+                                  userComment: _controllers[index].text,
+                                );
+                              },
+                              icon: const Icon(
+                                Icons.send,
+                                size: 14,
+                              ))
+                        ],
+                      ),
+                    ),
+                ],
+              ),
+            ),
+            const SizedBox(
+              height: 20,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class CommentWidget extends StatelessWidget {
+  CommentWidget({
+    required this.comments,
+    Key? key,
+  }) : super(key: key);
+  var comments;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 8.0),
+      child: SizedBox(
+        child: Row(
+          children: [
+            const SizedBox(
+              width: 15,
+            ),
+            Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(50),
+                image: DecorationImage(
+                  image: NetworkImage(
+                    comments.profileImage,
+                  ),
+                  fit: BoxFit.fill,
+                ),
+              ),
+            ),
+            const SizedBox(
+              width: 15,
+            ),
+            FittedBox(
+              fit: BoxFit.fitWidth,
+              child: Container(
+                padding: const EdgeInsets.all(10),
+                color: Color(0xffC4C4C4C4),
+                child: Text(comments.comment),
+              ),
+            ),
+            const SizedBox(
+              height: 20,
+            )
+          ],
         ),
       ),
     );

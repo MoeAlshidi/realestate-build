@@ -54,6 +54,18 @@ class UploadPostFeedError extends HomeState {
   UploadPostFeedError(this.error);
 }
 
+class UploadProjectImageLoading extends HomeState {}
+
+class UploadProjectImageSuccess extends HomeState {
+  final List<String> urlList;
+  UploadProjectImageSuccess(this.urlList);
+}
+
+class UploadProjectImageError extends HomeState {
+  final String error;
+  UploadProjectImageError(this.error);
+}
+
 //create Post
 class PostFeedLoading extends HomeState {}
 
@@ -97,6 +109,15 @@ class GetPostImageError extends HomeState {
   final String error;
   GetPostImageError(this.error);
 }
+
+class GetProjectImageSuccess extends HomeState {}
+
+class GetProjectImageError extends HomeState {
+  final String error;
+  GetProjectImageError(this.error);
+}
+
+class UpdateProjectImage extends HomeState {}
 
 //get Posts
 class GetPostFeedLoading extends HomeState {}

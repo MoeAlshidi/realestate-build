@@ -30,7 +30,7 @@ String selectedProject = '';
 List<ProjectModel> projects = [];
 
 List<String> images = [
-  'https://www.constructionweekonline.com/cloud/2021/07/07/idealmed-hospital-muscat-1.jpg',
-  'https://i0.wp.com/www.thearabianstories.com/wp-content/uploads/2022/01/Screenshot-2022-01-30-at-2.10.04-PM.png?resize=1170%2C610&ssl=1',
-  'https://www.meed.com/Uploads/Meed/2017/09/Hospital-construction-dreamstime_m_30665294.jpg',
+  // 'https://www.constructionweekonline.com/cloud/2021/07/07/idealmed-hospital-muscat-1.jpg',
+  // 'https://i0.wp.com/www.thearabianstories.com/wp-content/uploads/2022/01/Screenshot-2022-01-30-at-2.10.04-PM.png?resize=1170%2C610&ssl=1',
+  // 'https://www.meed.com/Uploads/Meed/2017/09/Hospital-construction-dreamstime_m_30665294.jpg',
 ];

@@ -1,3 +1,4 @@
+import 'package:build/models/comment_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class FeedModel {
@@ -8,6 +9,7 @@ class FeedModel {
   Timestamp? date;
   String? feedImages;
   String? profileImage;
+  List<dynamic>? comments;
 
   FeedModel({
     this.id,
@@ -17,6 +19,7 @@ class FeedModel {
     this.feed,
     this.feedImages,
     this.profileImage,
+    this.comments,
   });
   FeedModel.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -26,6 +29,8 @@ class FeedModel {
     date = json['date'];
     profileImage = json['profileImage'] ?? '';
     feedImages = json['feedImages'] ?? '';
+    comments =
+        List<Comment>.from(json["comments"].map((x) => Comment.fromJson(x)));
   }
   Map<String, dynamic> toMap() {
     return {
@@ -36,6 +41,7 @@ class FeedModel {
       'date': date,
       'feedImages': feedImages,
       'profileImage': profileImage,
+      'comments': comments,
     };
   }
 }

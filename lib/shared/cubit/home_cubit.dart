@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 
 import 'package:build/models/comment_model.dart';
 import 'package:build/models/feed_model.dart';
@@ -21,7 +22,6 @@ class HomeCubit extends Cubit<HomeState> {
   static HomeCubit get(BuildContext context) {
     return BlocProvider.of((context));
   }
-  // this is new master
 
   List<Widget> screenListAgent = [
     HomeScreen(),
@@ -80,12 +80,13 @@ class HomeCubit extends Cubit<HomeState> {
         print(progressprecent);
 
         getPosts(projectId: selectedProject);
-        getComments();
+        images = projectModel!.projectImages!;
         emit(GetProjectSuccess());
       }).catchError((error) {
         emit(GetProjectError(error.toString()));
       });
     } else {
+      projects.clear();
       FirebaseFirestore.instance.collection('Projects').get().then((value) {
         value.docs.forEach((element) {
           ProjectModel project = ProjectModel(
@@ -143,6 +144,37 @@ class HomeCubit extends Cubit<HomeState> {
     }
   }
 
+  File? projectImagePath;
+  List<File> projectImagePathList = [];
+  List<String> projectImageUrlList = [];
+  final pickerProject = ImagePicker();
+  Future<void> getProjectImagesFile() async {
+    projectImagePathList.clear();
+    final pickedFile = await pickerProject.pickMultiImage();
+
+    if (pickedFile != null) {
+      pickedFile.forEach((element) {
+        projectImagePath = File(element.path);
+        projectImagePathList.add(projectImagePath!);
+      });
+      emit(GetProjectImageSuccess());
+    } else {
+      emit(GetProjectImageError('No images Selected'));
+    }
+  }
+
+  void updateProjectImage({
+    required String projectId,
+    required List<String> images,
+  }) {
+    FirebaseFirestore.instance
+        .collection('Projects')
+        .doc(projectId)
+        .update({'projectImages': images}).then((value) {
+      emit(UpdateProjectImage());
+    });
+  }
+
   void uploadPostImage({required String feed, required DateTime date}) {
     emit(UploadPostFeedLoading());
     firebase_storage.FirebaseStorage.instance
@@ -161,6 +193,27 @@ class HomeCubit extends Cubit<HomeState> {
     });
   }
 
+  void uploadProjectImage() {
+    emit(UploadProjectImageLoading());
+    projectImagePathList.forEach((element) {
+      firebase_storage.FirebaseStorage.instance
+          .ref()
+          .child('Project/${Uri.file(element.path).pathSegments.last}')
+          .putFile(element)
+          .then((value) {
+        value.ref.getDownloadURL().then((value) {
+          projectImageUrlList.add(value);
+          print("DOING");
+
+          print(projectImageUrlList);
+        }).then((value) {
+          updateProjectImage(
+              images: projectImageUrlList, projectId: selectedProject);
+        });
+      });
+    });
+  }
+
   Future<void> createPost({
     required String feed,
     required String projectID,
@@ -168,20 +221,32 @@ class HomeCubit extends Cubit<HomeState> {
     required DateTime date,
   }) async {
     FeedModel model = FeedModel(
-        id: token,
-        date: Timestamp.fromDate(date),
-        profileImage: userModel!.profileImage,
-        feed: feed,
-        feedImages: image,
-        name: '${userModel!.fname} ${userModel!.lname}',
-        feedId: projectID);
+      id: token,
+      date: Timestamp.fromDate(date),
+      profileImage: userModel!.profileImage,
+      feed: feed,
+      feedImages: image,
+      name: '${userModel!.fname} ${userModel!.lname}',
+      feedId: '',
+      comments: [],
+    );
     FirebaseFirestore.instance
         .collection('Projects')
         .doc(projectID)
         .collection('Feeds')
-        .doc(model.feedId)
-        .set(model.toMap())
+        .add(model.toMap())
         .then((value) {
+      FirebaseFirestore.instance
+          .collection('Projects')
+          .doc(projectID)
+          .collection('Feeds')
+          .doc(value.id)
+          .update(
+        {
+          'feedId': value.id,
+        },
+      );
+
       emit(PostFeedSuccess());
     }).catchError((error) {
       emit(PostFeedError(error.toString()));
@@ -207,24 +272,28 @@ class HomeCubit extends Cubit<HomeState> {
         .doc(projectId)
         .collection('Feeds')
         .doc(commentId)
-        .collection('Comments')
-        .add(comment.toMap())
-        .then((value) {
+        .update(
+      {
+        'comments': FieldValue.arrayUnion([comment.toMap()]),
+      },
+    ).then((value) {
+      print('SEND IS DONNNEEE');
       emit(SendCommentsSuccess());
     }).catchError((error) {
+      print('ERRROR $error');
       emit(SendCommentsError(error.toString()));
     });
   }
 
   List<Comment> commentList = [];
-  void getComments() {
+  void getComments({required String feedID}) {
     commentList.clear();
     emit(GetCommentsLoading());
     FirebaseFirestore.instance
         .collection('Projects')
         .doc(selectedProject)
         .collection('Feeds')
-        .doc(selectedProject)
+        .doc(feedID)
         .collection('Comments')
         .get()
         .then((value) {
@@ -278,21 +347,22 @@ class HomeCubit extends Cubit<HomeState> {
   }) {
     feeds.clear();
     emit(GetPostFeedLoading());
-    print('HEllo');
-    print(selectedProject);
+
     FirebaseFirestore.instance
         .collection('Projects')
         .doc(selectedProject)
         .collection('Feeds')
         .get()
         .then((value) {
-      print(value.docs.length);
       value.docs.forEach(
         (element) {
           feeds.add(FeedModel.fromJson(element.data()));
+          print(' this is FEEDSS ${feeds[0].comments!.length}');
+          feeds.sort(((a, b) {
+            return b.date!.compareTo(a.date!);
+          }));
         },
       );
-      print('HII');
       emit(GetPostFeedSuccess());
     }).catchError((error) {
       emit(GetPostFeedError(error.toString()));
