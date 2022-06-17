@@ -33,7 +33,7 @@ class HomeCubit extends Cubit<HomeState> {
     const SettingsScreen(),
   ];
   int progress = 30;
-
+  bool isImage = false;
   int currentIndex = 0;
   void currentScreen(int index) {
     currentIndex = index;
@@ -138,6 +138,7 @@ class HomeCubit extends Cubit<HomeState> {
 
     if (pickedFile != null) {
       postImagePath = File(pickedFile.path);
+      isImage = true;
       emit(GetPostImageSuccess());
     } else {
       emit(GetPostImageError('No images Selected'));

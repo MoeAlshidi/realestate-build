@@ -6,15 +6,55 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../components/constant.dart';
 
-class FeedScreen extends StatelessWidget {
+class FeedScreen extends StatefulWidget {
   FeedScreen({Key? key}) : super(key: key);
+
+  @override
+  State<FeedScreen> createState() => _FeedScreenState();
+}
+
+class _FeedScreenState extends State<FeedScreen> {
   TextEditingController feedController = TextEditingController();
+
+  Future<void> _showMyDialog(ctx) async {
+    return showDialog<void>(
+      context: ctx,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: const [
+            AlertDialog(
+              title: Text('Posting Your Feed'),
+              content: Center(
+                child: SizedBox(
+                  width: 50,
+                  height: 50,
+                  child: CircularProgressIndicator(),
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<HomeCubit, HomeState>(
       listener: (context, state) {
+        if (state is UploadPostFeedLoading || state is PostFeedLoading) {
+          _showMyDialog(context);
+        }
         if (state is UploadPostFeedSuccess || state is PostFeedSuccess) {
+          HomeCubit.get(context).isImage = false;
+
+          Navigator.pop(context);
+
+          HomeCubit.get(context).currentIndex = 0;
           feedController.clear();
         }
       },
@@ -123,7 +163,7 @@ class FeedScreen extends StatelessWidget {
                     ),
                   ],
                 ),
-                if (homeCubit.postImagePath != null)
+                if (homeCubit.isImage == true)
                   Row(
                     children: [
                       SizedBox(

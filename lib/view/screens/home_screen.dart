@@ -56,6 +56,10 @@ class _HomeScreenState extends State<HomeScreen> {
     final screenSize = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: Icon(Icons.phone),
+          onPressed: () {},
+        ),
         title: const Text("Home"),
         centerTitle: true,
         backgroundColor: Colors.blue,
@@ -156,6 +160,25 @@ class _HomeScreenState extends State<HomeScreen> {
                         ],
                       ),
                     ),
+                  Padding(
+                    padding: const EdgeInsets.only(right: 10.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        IconButton(
+                          onPressed: () {},
+                          icon: const Icon(
+                            Icons.pin_drop,
+                            color: CustomColors.KredColor,
+                          ),
+                        ),
+                        const Text(
+                          'Location',
+                          style: TextStyle(fontWeight: FontWeight.w500),
+                        ),
+                      ],
+                    ),
+                  ),
                   const SizedBox(
                     height: 20,
                   ),
