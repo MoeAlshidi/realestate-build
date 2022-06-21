@@ -38,6 +38,8 @@ class UpdateImageError extends HomeState {
 }
 
 //Upload Profile
+class UploadProfileLoading extends HomeState {}
+
 class UploadProfileSuccess extends HomeState {}
 
 class UploadProfileError extends HomeState {

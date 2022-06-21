@@ -51,9 +51,7 @@ class _FeedScreenState extends State<FeedScreen> {
         }
         if (state is UploadPostFeedSuccess || state is PostFeedSuccess) {
           HomeCubit.get(context).isImage = false;
-
           Navigator.pop(context);
-
           HomeCubit.get(context).currentIndex = 0;
           feedController.clear();
         }

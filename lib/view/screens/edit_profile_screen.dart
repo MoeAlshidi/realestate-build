@@ -13,12 +13,45 @@ class EditScreen extends StatefulWidget {
 }
 
 class _EditScreenState extends State<EditScreen> {
+  Future<void> _showMyDialog(ctx) async {
+    return showDialog<void>(
+      context: ctx,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: const [
+            AlertDialog(
+              title: Text('Uploading Profile Picture..'),
+              content: Center(
+                child: SizedBox(
+                  width: 50,
+                  height: 50,
+                  child: CircularProgressIndicator(),
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) => HomeCubit(),
       child: BlocConsumer<HomeCubit, HomeState>(
-        listener: (context, state) {},
+        listener: (context, state) {
+          if (state is UploadProfileLoading) {
+            _showMyDialog(context);
+          }
+          if (state is UpdateImageSuccess) {
+            Navigator.pop(context);
+          }
+        },
         builder: (context, state) {
           HomeCubit homeCubit = HomeCubit.get(context);
           return Scaffold(

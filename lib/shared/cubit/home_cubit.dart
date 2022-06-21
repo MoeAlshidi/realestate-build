@@ -42,8 +42,9 @@ class HomeCubit extends Cubit<HomeState> {
 
   UserModel? userModel;
 
-  void getData() {
+  void getData({String? selected}) {
     emit(GetDataLoading());
+
     FirebaseFirestore.instance
         .collection('User')
         .doc(token)
@@ -168,12 +169,11 @@ class HomeCubit extends Cubit<HomeState> {
     required String projectId,
     required List<String> images,
   }) {
+    print('IN POSTING IMAGE');
     FirebaseFirestore.instance
         .collection('Projects')
         .doc(projectId)
-        .update({'projectImages': images}).then((value) {
-      emit(UpdateProjectImage());
-    });
+        .update({'projectImages': images}).then((value) {});
   }
 
   void uploadPostImage({required String feed, required DateTime date}) {
@@ -195,8 +195,9 @@ class HomeCubit extends Cubit<HomeState> {
   }
 
   void uploadProjectImage() {
+    int count = 0;
     emit(UploadProjectImageLoading());
-    projectImagePathList.forEach((element) {
+    for (var element in projectImagePathList) {
       firebase_storage.FirebaseStorage.instance
           .ref()
           .child('Project/${Uri.file(element.path).pathSegments.last}')
@@ -204,15 +205,19 @@ class HomeCubit extends Cubit<HomeState> {
           .then((value) {
         value.ref.getDownloadURL().then((value) {
           projectImageUrlList.add(value);
-          print("DOING");
-
-          print(projectImageUrlList);
         }).then((value) {
           updateProjectImage(
               images: projectImageUrlList, projectId: selectedProject);
+        }).then((value) {
+          count++;
+          print(count);
+          if (count == projectImagePathList.length) {
+            print('ALL DONE');
+            emit(UpdateProjectImage());
+          }
         });
       });
-    });
+    }
   }
 
   Future<void> createPost({
@@ -221,6 +226,7 @@ class HomeCubit extends Cubit<HomeState> {
     String? image,
     required DateTime date,
   }) async {
+    emit(PostFeedLoading());
     FeedModel model = FeedModel(
       id: token,
       date: Timestamp.fromDate(date),
@@ -247,7 +253,6 @@ class HomeCubit extends Cubit<HomeState> {
           'feedId': value.id,
         },
       );
-
       emit(PostFeedSuccess());
     }).catchError((error) {
       emit(PostFeedError(error.toString()));
@@ -312,6 +317,7 @@ class HomeCubit extends Cubit<HomeState> {
 
   String profileImageUrl = '';
   void uploadProfile() {
+    emit(UploadProfileLoading());
     firebase_storage.FirebaseStorage.instance
         .ref()
         .child('User/${Uri.file(profileimage!.path).pathSegments.last}')

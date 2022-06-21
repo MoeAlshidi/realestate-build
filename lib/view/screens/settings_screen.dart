@@ -14,10 +14,43 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
+  Future<void> _showMyDialog(ctx) async {
+    return showDialog<void>(
+      context: ctx,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: const [
+            AlertDialog(
+              title: Text('Uploading Photos..'),
+              content: Center(
+                child: SizedBox(
+                  width: 50,
+                  height: 50,
+                  child: CircularProgressIndicator(),
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<HomeCubit, HomeState>(
-      listener: (context, state) {},
+      listener: (context, state) {
+        if (state is UploadProjectImageLoading) {
+          _showMyDialog(context);
+        }
+        if (state is UpdateProjectImage) {
+          Navigator.pop(context);
+        }
+      },
       builder: (context, state) {
         HomeCubit homeCubit = HomeCubit.get(context);
         var profileImage = HomeCubit.get(context).profileimage;

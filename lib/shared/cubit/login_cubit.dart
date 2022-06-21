@@ -47,8 +47,8 @@ class LoginCubit extends Cubit<LoginState> {
   }) {
     ProjectModel projectModel = ProjectModel(
       progress: 0,
-      latitude: '23.6182',
-      longitude: '58.5945',
+      latitude: '23.585890',
+      longitude: '58.405922',
       userID: userID,
       username: '$fname Project',
       projectId: projectID,
