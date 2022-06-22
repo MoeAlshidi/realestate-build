@@ -178,6 +178,7 @@ class HomeCubit extends Cubit<HomeState> {
 
   void uploadPostImage({required String feed, required DateTime date}) {
     emit(UploadPostFeedLoading());
+    print('in here');
     firebase_storage.FirebaseStorage.instance
         .ref()
         .child('feeds/${Uri.file(postImagePath!.path).pathSegments.last}')
@@ -186,8 +187,14 @@ class HomeCubit extends Cubit<HomeState> {
       value.ref.getDownloadURL().then((value) {
         postImageUrl = value;
         createPost(
-            feed: feed, date: date, image: value, projectID: selectedProject);
-        emit(UploadPostFeedSuccess());
+                feed: feed,
+                date: date,
+                image: value,
+                projectID: selectedProject)
+            .then((value) {
+          print('smth');
+          emit(UploadPostFeedSuccess());
+        });
       });
     }).catchError((error) {
       emit(UploadPostFeedError(error.toString()));
@@ -253,6 +260,7 @@ class HomeCubit extends Cubit<HomeState> {
           'feedId': value.id,
         },
       );
+      print('okatt?');
       emit(PostFeedSuccess());
     }).catchError((error) {
       emit(PostFeedError(error.toString()));

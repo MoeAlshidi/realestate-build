@@ -19,7 +19,7 @@ class _FeedScreenState extends State<FeedScreen> {
   Future<void> _showMyDialog(ctx) async {
     return showDialog<void>(
       context: ctx,
-      barrierDismissible: false,
+      barrierDismissible: true,
       builder: (BuildContext context) {
         return Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -49,12 +49,19 @@ class _FeedScreenState extends State<FeedScreen> {
         if (state is UploadPostFeedLoading || state is PostFeedLoading) {
           _showMyDialog(context);
         }
-        if (state is UploadPostFeedSuccess || state is PostFeedSuccess) {
-          HomeCubit.get(context).isImage = false;
+        if (state is PostFeedSuccess) {
           Navigator.pop(context);
+          HomeCubit.get(context).isImage = false;
+
           HomeCubit.get(context).currentIndex = 0;
           feedController.clear();
         }
+        // if (state is PostFeedSuccess) {
+        //   HomeCubit.get(context).isImage = false;
+        //   Navigator.pop(context);
+        //   HomeCubit.get(context).currentIndex = 0;
+        //   feedController.clear();
+        // }
       },
       builder: (context, state) {
         HomeCubit homeCubit = HomeCubit.get(context);
